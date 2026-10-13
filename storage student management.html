@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Management App</title>
+  <style>
+    /* Clean and simple layout styles */
+    body { font-family: Arial, sans-serif; margin: 30px; background-color: #f4f6f9; }
+    .box { background: white; padding: 20px; border-radius: 8px; border: 1px solid #ccc; max-width: 600px; margin: auto; }
+    input { width: 95%; padding: 8px; margin: 6px 0; }
+    button { padding: 8px 15px; margin-top: 5px; cursor: pointer; }
+    .add-btn { background-color: #28a745; color: white; border: none; font-weight: bold; width: 99%; }
+    .del-btn { background-color: #dc3545; color: white; border: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background-color: #007bff; color: white; }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h2>Student Management System</h2>
+    
+    <!-- Input Form -->
+    <form id="studentForm">
+      <input type="text" id="sid" placeholder="Student ID" required><br>
+      <input type="text" id="sname" placeholder="Name" required><br>
+      <input type="text" id="scourse" placeholder="Course" required><br>
+      <input type="number" id="smarks" placeholder="Marks" required><br>
+      <button type="submit" class="add-btn">Add Student</button>
+    </form>
+
+    <!-- Data Display Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Course</th>
+          <th>Marks</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Javascript dynamically inserts rows here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // 1. Load data array from browser local storage as objects, or start empty
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+
+    // 2. Clear table and display updated list contents dynamically
+    function displayTable() {
+      let tbody = document.getElementById("tableBody");
+      tbody.innerHTML = ""; // Clear existing rows
+
+      // Traditional basic loop mapping data out directly into HTML rows
+      for (let i = 0; i < students.length; i++) {
+        tbody.innerHTML += `
+          <tr>
+            <td><b>${students[i].id}</b></td>
+            <td>${students[i].name}</td>
+            <td>${students[i].course}</td>
+            <td>${students[i].marks}</td>
+            <td><button class="del-btn" onclick="deleteStudent(${i})">Delete</button></td>
+          </tr>`;
+      }
+    }
+
+    // 3. Handle data object collection when form is submitted
+    document.getElementById("studentForm").addEventListener("submit", function(e) {
+      e.preventDefault(); // Stop standard browser page refresh
+
+      // Bundle input text items cleanly as a JSON object block
+      let newStudent = {
+        id: document.getElementById("sid").value,
+        name: document.getElementById("sname").value,
+        course: document.getElementById("scourse").value,
+        marks: document.getElementById("smarks").value
+      };
+
+      students.push(newStudent); // Push new object to target array
+      localStorage.setItem("students", JSON.stringify(students)); // Save stringified JSON tracking state
+      displayTable(); // Refresh rendering layout view
+      this.reset(); // Wipe all input form values clean
+    });
+
+    // 4. Handle element tracking removals from array matching index selection
+    function deleteStudent(index) {
+      students.splice(index, 1); // Slice out target item
+      localStorage.setItem("students", JSON.stringify(students)); // Save matching changes to storage
+      displayTable(); // Redraw layout view
+    }
+
+    // Baseline display run when system loads up initially
+    displayTable();
+  </script>
+
+</body>
+</html>
